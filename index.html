@@ -295,6 +295,28 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sura-hint{color:var(--muted);font-weight:600;font-size:15px;margin:0;text-align:center}
 
 
+
+/* Feedback effects */
+.sndbtn{flex:0 0 auto;width:46px;height:46px;border-radius:14px;border:2px solid var(--line);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--acc)}
+.sndbtn[aria-pressed="false"]{color:var(--muted)}
+.shake{animation:shake .55s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-12px)}30%{transform:translateX(10px)}45%{transform:translateX(-8px)}60%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+.cheer{animation:cheer .6s ease}
+@keyframes cheer{0%{transform:scale(1)}35%{transform:scale(1.035)}100%{transform:scale(1)}}
+.fxl{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.conf{position:absolute;width:10px;height:14px;border-radius:3px;animation:burst 1.3s cubic-bezier(.15,.7,.35,1) forwards}
+.conf.r{border-radius:50%;width:11px;height:11px}
+@keyframes burst{0%{transform:translate(0,0) rotate(0);opacity:1}80%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+.flash{position:fixed;inset:0;pointer-events:none;z-index:59;background:var(--bad);animation:flash .5s ease forwards}
+@keyframes flash{0%{opacity:.22}100%{opacity:0}}
+.bigmark{position:fixed;left:50%;top:42%;z-index:61;pointer-events:none;width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;animation:markpop .95s ease forwards;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.bigmark.good{background:var(--good)} .bigmark.part{background:var(--part)} .bigmark.bad{background:var(--bad)}
+@keyframes markpop{0%{transform:translate(-50%,-50%) scale(.2) rotate(-20deg);opacity:0}25%{transform:translate(-50%,-50%) scale(1.12) rotate(0);opacity:1}45%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{transform:translate(-50%,-60%) scale(.9);opacity:0}}
+.streak{margin:0;font-weight:700;color:var(--good);font-size:18px}
+.stars svg.on{animation:starin .5s ease backwards}
+.stars svg.on:nth-child(2){animation-delay:.25s}.stars svg.on:nth-child(3){animation-delay:.5s}
+@keyframes starin{0%{transform:scale(0) rotate(-90deg)}70%{transform:scale(1.25)}100%{transform:none}}
+
 .pop{animation:pop .35s ease}
 @keyframes pop{0%{transform:scale(.96);opacity:.6}100%{transform:none;opacity:1}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -384,6 +406,7 @@ img{max-width:100%}
         <div class="qhead">
           <button type="button" class="back" id="back" aria-label="العودة إلى قائمة الدروس"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <div class="bar" aria-hidden="true"><i id="prog"></i></div>
+          <button type="button" class="sndbtn" id="sndbtn" aria-pressed="true" aria-label="الصوت"></button>
           <div class="timer" id="timer" hidden></div>
           <div class="pts" id="pts"></div>
         </div>
@@ -721,6 +744,79 @@ $('#labgroups').addEventListener('click', e=>{
 });
 $('#labreset').addEventListener('click', renderLab);
 
+
+/* ================= sounds & effects ================= */
+const SP_ON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>', SP_OFF = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+let SND = store('rv-snd') !== 'off', AC = null;
+const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function paintSnd(){ const b=$('#sndbtn'); b.setAttribute('aria-pressed', SND); b.innerHTML = SND ? SP_ON : SP_OFF; b.setAttribute('aria-label', SND ? 'إيقاف الصوت' : 'تشغيل الصوت'); }
+$('#sndbtn').addEventListener('click', ()=>{ SND = !SND; store('rv-snd', SND?'on':'off'); paintSnd(); if(SND) sfx('tick'); });
+paintSnd();
+function ac(){
+  if(!AC){ try{ AC = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ AC = null; } }
+  if(AC && AC.state === 'suspended'){ try{ AC.resume(); }catch(e){} }
+  return AC;
+}
+document.addEventListener('pointerdown', ()=>{ if(SND) ac(); });
+function tone(f, t0, d, type, vol){
+  const a = ac(); if(!a) return;
+  const t = a.currentTime + t0, o = a.createOscillator(), g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + d + 0.05);
+}
+function slide(f1, f2, t0, d, type, vol){
+  const a = ac(); if(!a) return;
+  const t = a.currentTime + t0, o = a.createOscillator(), g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(f2, t + d);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + d + 0.05);
+}
+function sfx(k){
+  if(!SND) return;
+  if(k==='good'){ [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f, i*0.075, 0.28, 'triangle', 0.22)); tone(1568, 0.3, 0.35, 'sine', 0.08); }
+  else if(k==='part'){ tone(523.25, 0, 0.2, 'triangle', 0.2); tone(659.25, 0.12, 0.3, 'triangle', 0.18); }
+  else if(k==='bad'){ slide(330, 150, 0, 0.45, 'sawtooth', 0.09); tone(110, 0.05, 0.35, 'square', 0.05); }
+  else if(k==='tick'){ tone(1046.5, 0, 0.07, 'sine', 0.09); }
+  else if(k==='win'){ [523.25,659.25,783.99,1046.5,783.99,1046.5,1318.5].forEach((f,i)=>tone(f, i*0.11, i===6?0.6:0.22, 'triangle', 0.2)); }
+  else if(k==='meh'){ [392,349.2,329.6].forEach((f,i)=>tone(f, i*0.16, 0.3, 'triangle', 0.16)); }
+}
+const MARK = {
+  good:'<svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  part:'<svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg>',
+  bad:'<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>'
+};
+function confetti(n, y){
+  if(RM) return;
+  const layer = document.createElement('div'); layer.className = 'fxl';
+  const cx = innerWidth/2, cy = innerHeight*(y||0.42);
+  const cols = ['#F2C230','#2E7D32','#2D5BBF','#C2570C','#B0346A','#1F6FC8','#23864C'];
+  for(let i=0;i<n;i++){
+    const p = document.createElement('i'); p.className = 'conf' + (i%3===0?' r':'');
+    const ang = Math.random()*Math.PI*2, dist = 110 + Math.random()*Math.min(260, innerWidth*0.55);
+    p.style.left = cx+'px'; p.style.top = cy+'px'; p.style.background = cols[i%cols.length];
+    p.style.setProperty('--dx', Math.cos(ang)*dist + 'px');
+    p.style.setProperty('--dy', Math.sin(ang)*dist + 180 + 'px');
+    p.style.setProperty('--r', (Math.random()*900-450) + 'deg');
+    p.style.animationDelay = (Math.random()*0.1) + 's';
+    layer.appendChild(p);
+  }
+  document.body.appendChild(layer); setTimeout(()=>layer.remove(), 1700);
+}
+function reward(c){
+  const k = c.frac===1 ? 'good' : c.frac>0 ? 'part' : 'bad';
+  sfx(k);
+  const card = $('#qbody');
+  card.classList.remove('shake','cheer','pop'); void card.offsetWidth;
+  card.classList.add(k==='bad' ? 'shake' : 'cheer');
+  if(!RM){
+    const m = document.createElement('div'); m.className = 'bigmark ' + k; m.innerHTML = MARK[k];
+    document.body.appendChild(m); setTimeout(()=>m.remove(), 1000);
+  }
+  if(k==='bad'){ const f = document.createElement('div'); f.className = 'flash'; document.body.appendChild(f); setTimeout(()=>f.remove(), 600); }
+  else confetti(k==='good' ? (c.streak>=3 ? 60 : 36) : 12);
+}
+
 /* ================= quiz engine ================= */
 const TYPE = { mcq:'اختيار من متعدد', tf:'صحيح أم خطأ', fill:'أكمل الفراغ', multi:'عدة إجابات', match:'صِل', order:'رتّب', classify:'صنّف' };
 let LVL = 'mid';
@@ -850,7 +946,7 @@ function footHTML(c){
   const last = S.i === S.qs.length-1;
   return `<div class="fb ${cls} pop" role="status"><h3><span>${title}</span><span>+${fmt(c.earned)} / ${c.pts}</span></h3>
     ${c.frac<1 ? `<p>الإجابة الصحيحة: <span class="ans">${answerText(c)}</span></p>`:''}
-    <p>${c.exp}</p></div>
+    <p>${c.exp}</p>${c.frac===1 && c.streak>=3 ? `<p class="streak">رائع! ${c.streak} إجابات صحيحة متتالية</p>` : ''}</div>
     <button type="button" class="btn primary" id="next">${last?'عرض النتيجة':'السؤال التالي'}</button>`;
 }
 function draw(fresh){
@@ -883,12 +979,14 @@ function startTimer(){
   TICK = setInterval(()=>{
     if(c.done){ stopTimer(); return; }
     c.left--; paintTimer(c);
-    if(c.left<=0){ stopTimer(); c.timeout = true; commit(c, ready(c) ? grade(c) : 0); draw(); }
+    if(c.left>0 && c.left<=5) sfx('tick');
+    if(c.left<=0){ stopTimer(); c.timeout = true; commit(c, ready(c) ? grade(c) : 0); draw(); reward(c); }
   }, 1000);
 }
 function commit(c, frac){
   c.frac = frac; c.earned = Math.round(frac * c.pts * 10)/10; c.done = true; c.sel = null;
   S.score += c.earned;
+  S.streak = frac===1 ? (S.streak||0) + 1 : 0; c.streak = S.streak;
   paintTimer(c);
 }
 
@@ -949,7 +1047,7 @@ $('#qfoot').addEventListener('click', e=>{
   if(e.target.closest('#check')){
     if(!ready(c)) return;
     stopTimer(); commit(c, grade(c));
-    draw(); $('#qfoot').scrollIntoView({behavior:'smooth', block:'nearest'});
+    draw(); reward(c); $('#qfoot').scrollIntoView({behavior:'smooth', block:'nearest'});
   }
   if(e.target.closest('#next')){
     if(S.i < S.qs.length-1){ S.i++; draw(true); } else finish();
@@ -997,6 +1095,7 @@ function finish(){
       <div class="rv" style="--acc:${L()[c.l].c}"><span class="rq">${c.q}${c.type==='fill'?` <span class="${typeof c.verse==='string'?'q-ar':''}">${(typeof c.verse==='string'?c.verse:c.sent).replace('___','…')}</span>`:''}</span>
       <span class="ra">${answerText(c)}</span></div>`).join('')}</div>` : ''}`;
   showQ('end');
+  if(stars>=2){ sfx('win'); confetti(stars===3 ? 90 : 50, 0.3); } else sfx('meh');
   $('#retry').addEventListener('click', ()=>start(S.filter));
   $('#tohome').addEventListener('click', ()=>qhome());
   const th = $('#tohard'); if(th) th.addEventListener('click', ()=>{ LVL='hard'; store('rv-lvl-'+SUB,'hard'); start(S.filter); });
