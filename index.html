@@ -410,7 +410,7 @@ img{max-width:100%}
         <div class="hero"><small id="heroSmall"></small><h2 id="heroTitle"></h2><p>اختر المستوى ثم الدرس، واجمع النقاط لتحصل على النجوم.</p></div>
         <div class="levels" id="levels">
           <button type="button" class="lvl" data-lvl="mid" aria-pressed="true"><b>المستوى المتوسط</b><span>أسئلة الدرس الأساسية، بدون وقت</span></button>
-          <button type="button" class="lvl hard" data-lvl="hard" aria-pressed="false"><b>المستوى الصعب</b><span>أسئلة أعمق مع مؤقّت لكل سؤال</span></button>
+          <button type="button" class="lvl hard" data-lvl="hard" aria-pressed="false"><b>المستوى الصعب</b><span>أسئلة أعمق وتحليل ووضعيات</span></button>
         </div>
         <div class="lessons" id="lessons"></div>
         <button type="button" class="btn allbtn" id="allbtn"></button>
@@ -1015,13 +1015,13 @@ let TICK = null;
 function stopTimer(){ if(TICK){ clearInterval(TICK); TICK = null; } }
 function paintTimer(c){
   const t = $('#timer');
-  t.hidden = !(S && S.lvl==='hard');
+  t.hidden = true;
   if(t.hidden) return;
   t.textContent = (c.done || c.left==null ? '—' : c.left) + ' ث';
   t.classList.toggle('warn', !c.done && c.left!=null && c.left<=10);
 }
 function startTimer(){
-  stopTimer();
+  stopTimer(); return;
   const c = cur();
   if(c.left == null) c.left = ['match','order','classify'].includes(c.type) ? 90 : 45;
   paintTimer(c);
