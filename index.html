@@ -375,6 +375,23 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 @keyframes fcflip{0%{transform:perspective(600px) rotateY(80deg)}100%{transform:none}}
 .fchead{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;font-weight:700;color:var(--muted)}
 
+
+/* accordion */
+.acclist{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.acc{border:2px solid color-mix(in srgb, var(--acc) 40%, var(--line));border-radius:20px;background:var(--surface);overflow:hidden}
+.acc-h{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;background:transparent;border:0;cursor:pointer;text-align:start;min-height:66px;color:var(--ink)}
+.acc-h[aria-expanded="true"]{background:color-mix(in srgb, var(--acc) 9%, var(--surface));border-bottom:2px solid color-mix(in srgb, var(--acc) 30%, var(--line))}
+.acc-dot{flex:0 0 auto;width:42px;height:42px;border-radius:12px;background:var(--acc);color:var(--on-acc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:19px}
+.acc-t{flex:1 1 auto;display:flex;flex-direction:column;min-width:0}
+.acc-t b{font-size:20px;color:var(--acc);line-height:1.4}
+.acc-t small{font-size:14px;color:var(--muted);font-weight:600}
+.acc-c{flex:0 0 auto;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;direction:ltr}
+.acc-c.full{color:var(--good)}
+.acc-ch{flex:0 0 auto;color:var(--acc);transition:transform .25s}
+.acc-h[aria-expanded="true"] .acc-ch{transform:rotate(180deg)}
+.acc-b{padding:12px}
+.acc-b .fcgrid{margin:0}
+
 .pop{animation:pop .35s ease}
 @keyframes pop{0%{transform:scale(.96);opacity:.6}100%{transform:none;opacity:1}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -446,9 +463,9 @@ img{max-width:100%}
     </section>
 
     <section id="v-cards" class="narrow" hidden>
-      <div class="circintro"><h2>بطاقات الحفظ</h2><p>اقرأ السؤال، حاول الإجابة في رأسك، ثم اضغط على البطاقة لترى الجواب.</p></div>
+      <div class="circintro"><h2>بطاقات الحفظ</h2><p>اضغط على الدرس لتفتح بطاقاته، اقرأ السؤال وأجب في رأسك، ثم اضغط على البطاقة لترى الجواب.</p></div>
       <div class="fchead"><span id="fcprog"></span><div class="bar" aria-hidden="true"><i id="fcbar"></i></div></div>
-      <div class="fcgrid" id="fcgrid"></div>
+      <div class="acclist" id="fcgrid"></div>
       <div class="labtools"><button type="button" class="btn ghost" id="fcshuffle">اخلط البطاقات</button><button type="button" class="btn ghost" id="fcreset">أعد من البداية</button><button type="button" class="btn primary" data-go="quiz">ابدأ المسابقة</button></div>
     </section>
 
@@ -1150,28 +1167,48 @@ const PHY_FC = [
 /* flip cards activity */
 const FCSETS = { islam:ISL_FC, science:SCI_FC, physics:PHY_FC, civic:FCARDS };
 let FC_KNOWN = new Set();
-function renderCards(order){
+let ACC_OPEN = new Set();
+const CHEV = '<svg class="acc-ch" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+function renderCards(mix){
   const L0 = SB().L, set = FCSETS[SUB];
-  const idx = order || set.map((_,i)=>i);
-  $('#fcgrid').innerHTML = idx.map(i=>{
-    const [l,f,b] = set[i];
-    return `<button type="button" class="fcard ${FC_KNOWN.has(i)?'known':''}" data-fc="${i}" style="--acc:${L0[l].c}" aria-pressed="false">
-      <span class="fc-tag">${L0[l].n}</span>
-      <span class="fc-front">${f}</span>
-      <span class="fc-back">${b}</span>
-      <span class="fc-hint">اضغط لترى الجواب</span>
-    </button>`;
+  $('#fcgrid').innerHTML = Object.keys(L0).map((k,li)=>{
+    let idx = set.map((c,i)=>c[0]===k ? i : -1).filter(i=>i>=0);
+    if(!idx.length) return '';
+    if(mix) idx = shuffle(idx);
+    const open = ACC_OPEN.has(k);
+    return `<div class="acc" style="--acc:${L0[k].c}">
+      <button type="button" class="acc-h" data-acc="${k}" aria-expanded="${open}" aria-controls="acc-${k}">
+        <span class="acc-dot">${li+1}</span>
+        <span class="acc-t"><b>${L0[k].n}</b><small>${L0[k].d} · ${idx.length} بطاقات</small></span>
+        <span class="acc-c" id="accc-${k}"></span>${CHEV}
+      </button>
+      <div class="acc-b" id="acc-${k}" ${open?'':'hidden'}><div class="fcgrid">${idx.map(i=>{
+        const [l,f,b] = set[i];
+        return `<button type="button" class="fcard ${FC_KNOWN.has(i)?'known':''}" data-fc="${i}" aria-pressed="false">
+          <span class="fc-front">${f}</span><span class="fc-back">${b}</span><span class="fc-hint">اضغط لترى الجواب</span></button>`;
+      }).join('')}</div></div>
+    </div>`;
   }).join('');
   paintFC();
 }
-function paintFC(){ const n = FCSETS[SUB].length; $('#fcprog').textContent = `قلبتَ ${FC_KNOWN.size} من ${n} بطاقة`; $('#fcbar').style.width = (FC_KNOWN.size/n*100)+'%'; if(FC_KNOWN.size===n && n && typeof confetti==='function' && !paintFC.done){ paintFC.done=true; confetti(50,0.35); if(typeof sfx==='function') sfx('win'); } }
+function paintFC(){ const n = FCSETS[SUB].length;
+  Object.keys(SB().L).forEach(k=>{ const el = $('#accc-'+k); if(!el) return; const ids = FCSETS[SUB].map((c,i)=>c[0]===k?i:-1).filter(i=>i>=0); const kn = ids.filter(i=>FC_KNOWN.has(i)).length; el.textContent = `${kn}/${ids.length}`; el.classList.toggle('full', kn===ids.length); });
+  $('#fcprog').textContent = `قلبتَ ${FC_KNOWN.size} من ${n} بطاقة`; $('#fcbar').style.width = (FC_KNOWN.size/n*100)+'%'; if(FC_KNOWN.size===n && n && typeof confetti==='function' && !paintFC.done){ paintFC.done=true; confetti(50,0.35); if(typeof sfx==='function') sfx('win'); } }
 $('#fcgrid').addEventListener('click', e=>{
+  const h = e.target.closest('[data-acc]');
+  if(h){
+    const k = h.dataset.acc, open = h.getAttribute('aria-expanded') !== 'true';
+    h.setAttribute('aria-expanded', open);
+    const body = $('#acc-'+k); body.hidden = !open;
+    if(open){ ACC_OPEN.add(k); body.classList.remove('pop'); void body.offsetWidth; body.classList.add('pop'); } else ACC_OPEN.delete(k);
+    return;
+  }
   const c = e.target.closest('[data-fc]'); if(!c) return;
   const on = c.getAttribute('aria-pressed') !== 'true';
   c.setAttribute('aria-pressed', on);
   if(on){ FC_KNOWN.add(+c.dataset.fc); c.classList.add('known'); paintFC(); if(typeof sfx==='function') sfx('tick'); }
 });
-$('#fcshuffle').addEventListener('click', ()=>renderCards(shuffle(FCSETS[SUB].map((_,i)=>i))));
+$('#fcshuffle').addEventListener('click', ()=>renderCards(true));
 $('#fcreset').addEventListener('click', ()=>{ FC_KNOWN = new Set(); paintFC.done=false; renderCards(); });
 
 const ICON = {
@@ -1279,7 +1316,7 @@ function openSubject(s, v){
     S = null; qhome(false);
     if(SUB==='science') renderLab();
     if(SUB==='physics') renderCirc();
-    FC_KNOWN = new Set(); paintFC.done = false; renderCards();
+    FC_KNOWN = new Set(); ACC_OPEN = new Set(); paintFC.done = false; renderCards();
     $('#tabs').classList.toggle('four', sb.tabs.length > 3);
   }
   VIEW = v;
