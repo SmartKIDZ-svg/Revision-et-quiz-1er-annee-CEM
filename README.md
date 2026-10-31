@@ -1,6 +1,6 @@
 # مراجعة دروسي — Révision et quiz
 
-Application de révision, organisée par année scolaire.
+Application de révision, organisée par année scolaire. Chaque matière a une carte mentale, une activité (expériences ou circuits), des cartes de mémorisation et un quiz à deux niveaux.
 
 ## السنة الأولى متوسط (1AM)
 
