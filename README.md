@@ -7,6 +7,7 @@ Application de révision, organisée par année scolaire. Chaque matière a une 
 - **التربية الإسلامية** : carte mentale (sourate At-Tariq, أركان الإيمان، الطهارة، الصدق), texte de la sourate avec mode mémorisation, quiz à deux niveaux.
 - **التربية العلمية** — الإنسان والصحة : carte mentale (مصدر الأغذية، تركيبها، دورها، الراتب الغذائي), mini-laboratoire d'expériences, quiz à deux niveaux.
 - **العلوم الفيزيائية** — الظواهر الكهربائية : carte mentale avec schémas, laboratoire de circuits interactifs, quiz à deux niveaux.
+- **التاريخ** — علم الآثار وما قبل التاريخ : carte mentale (الآثار وأنواعها، الخطوات المنهجية لدراسة الآثار، المصطلحات، العصر الحجري القديم, frise chronologique), activité « رحلة عالم الآثار » avec frise interactive, cartes de mémorisation, quiz à deux niveaux.
 
 ## السنة الخامسة ابتدائي (5AP)
 
