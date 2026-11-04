@@ -8,6 +8,7 @@ Application de révision, organisée par année scolaire. Chaque matière a une 
 - **التربية العلمية** — الإنسان والصحة : carte mentale (مصدر الأغذية، تركيبها، دورها، الراتب الغذائي), mini-laboratoire d'expériences, quiz à deux niveaux.
 - **العلوم الفيزيائية** — الظواهر الكهربائية : carte mentale avec schémas, laboratoire de circuits interactifs, quiz à deux niveaux.
 - **التاريخ** — علم الآثار وما قبل التاريخ : carte mentale (الآثار وأنواعها، الخطوات المنهجية لدراسة الآثار، المصطلحات، العصر الحجري القديم, frise chronologique), activité « رحلة عالم الآثار » avec frise interactive, cartes de mémorisation, quiz à deux niveaux.
+- **الجغرافيا** — الإحداثيات الجغرافية : carte mentale (الأرض في الفضاء، شكل الأرض، خطوط الطول، دوائر العرض، حساب الوقت), exercices interactifs de calcul de l'heure entre deux villes (en 3 étapes, niveau facile et défi), cartes de mémorisation, quiz à deux niveaux.
 
 ## السنة الخامسة ابتدائي (5AP)
 
