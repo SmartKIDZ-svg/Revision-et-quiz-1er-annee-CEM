@@ -22,3 +22,7 @@ Les cartes mentales à imprimer sont dans le dossier `cartes/`.
 ## Sujets d'examens et devoirs (1AM, trimestre 1)
 
 Dans l'application : 1ère année CEM → « مواضيع الاختبارات والفروض ». Les PDF sont dans le dossier `examens/` (un fichier d'examens et un fichier de devoirs par matière, 8 sujets chacun).
+
+## Sujets d'examens 5AP (trimestre 1)
+
+Dans l'application : 5ème année primaire → « مواضيع الاختبارات ». Un PDF d'examens par matière (9 matières), fichiers `examens/5ap-*.pdf`.

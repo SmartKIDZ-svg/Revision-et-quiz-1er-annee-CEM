@@ -2336,6 +2336,19 @@ const EXAMS = [
 const EX_BASE = /github\.io$/.test(location.hostname) ? 'examens/' : 'https://smartkidz-svg.github.io/Revision-et-quiz-1er-annee-CEM/examens/';
 const EX_IC = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>';
 const PDF_IC = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>';
+const EXAMS5 = [
+  ['arabe','اللغة العربية'],['maths','الرياضيات'],['sciences','التربية العلمية والتكنولوجية'],['islamique','التربية الإسلامية'],
+  ['civique','التربية المدنية'],['histoire','التاريخ'],['geographie','الجغرافيا'],['francais','اللغة الفرنسية'],['anglais','اللغة الإنجليزية']
+];
+function showExams5(){
+  showSubjects();
+  $('.shint').hidden = true;
+  $('#lvBack').hidden = false; $('#lvBack').dataset.to = 'y5ap'; $('#lvBack').textContent = '→ السنة الخامسة ابتدائي';
+  $('#shTitle').textContent = 'مواضيع الاختبارات';
+  $('#shSub').textContent = 'السنة الخامسة ابتدائي · الفصل الأول · اختر المادة';
+  $('#scards').innerHTML = EXAMS5.map(([k,n])=>`<div class="excard"><b>${n}</b><div class="exbtns"><a class="ex" href="${EX_BASE}5ap-${k}-examens.pdf" target="_blank" rel="noopener">${PDF_IC}الاختبارات</a></div></div>`).join('')
+    + '<p class="exnote">يُفتح كل ملف PDF في صفحة جديدة (يتطلب الاتصال بالإنترنت).</p>';
+}
 function showExams(){
   showSubjects();
   $('#lvBack').hidden = false; $('#lvBack').dataset.to = 'y1am'; $('#lvBack').textContent = '→ السنة الأولى متوسط';
@@ -2354,7 +2367,7 @@ function showSubjects(lv){
   $('#shTitle').textContent = L0 ? L0.n : 'مراجعة دروسي';
   $('#shSub').textContent = L0 ? 'اختر المادة' : 'اختر السنة الدراسية';
   $('#scards').innerHTML = L0
-    ? L0.subj.map(k=>scard(k+'-map', SICON[k], SUBJ[k].title, SDESC[k], SUBJ[k].base)).join('') + (lv==='y1am' ? scard('exams1am', EX_IC, 'مواضيع الاختبارات والفروض', 'الفصل الأول · 9 مواد · 72 اختبارًا و72 فرضًا', 'var(--navy)') : '')
+    ? L0.subj.map(k=>scard(k+'-map', SICON[k], SUBJ[k].title, SDESC[k], SUBJ[k].base)).join('') + (lv==='y1am' ? scard('exams1am', EX_IC, 'مواضيع الاختبارات والفروض', 'الفصل الأول · 9 مواد · 72 اختبارًا و72 فرضًا', 'var(--navy)') : '') + (lv==='y5ap' ? scard('exams5ap', EX_IC, 'مواضيع الاختبارات', 'الفصل الأول · 9 مواد', 'var(--civ)') : '')
     : Object.entries(LEVELS).map(([k,o])=>scard(k, `<span class="lvn">${o.badge}</span>`, o.n, o.s, o.c)).join('');
   document.documentElement.style.removeProperty('--base');
   window.scrollTo(0,0);
@@ -2396,6 +2409,7 @@ function route(){
   const h = location.hash.slice(1);
   if(!h || LEVELS[h]) return showSubjects(h);
   if(h==='exams1am') return showExams();
+  if(h==='exams5ap') return showExams5();
   const [s,v] = h.split('-');
   openSubject(s, v || 'map');
 }
