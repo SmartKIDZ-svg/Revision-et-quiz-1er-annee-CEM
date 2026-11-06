@@ -485,7 +485,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 
 /* mathematics */
-.mth{direction:ltr;unicode-bidi:isolate;display:inline-block;white-space:nowrap;font-weight:800}
+.mth{direction:ltr;unicode-bidi:isolate;display:inline-block;font-weight:800}
 .frc{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;font-size:.82em;margin:0 2px}
 .frc b{border-bottom:2px solid currentColor;padding:0 3px;font-weight:800}
 .frc i{font-style:normal;font-weight:800;padding:0 3px}
@@ -1672,6 +1672,31 @@ function mcqN(l, q, ok, wrong, exp){
   return { l, type:'mcq', q, options:opts, exp };
 }
 
+/* keep every calculation left-to-right inside Arabic text */
+const MRUN = /[0-9A-Z(\[](?:[0-9A-Za-z,.×÷=<>+−\-()\[\]\/⊥∈∉′₁₂? ]*[0-9A-Za-z)\]?])?/g;
+const MOP = /[×÷=<>+−\/⊥∈∉]|\d \d|\d [A-Za-z]/;
+function mfixText(t){ return t.replace(MRUN, m => MOP.test(m) ? `<span class="mth">${m}</span>` : m); }
+function mfix(h){
+  if(typeof h !== 'string') return h;
+  let out = '', i = 0;
+  while(i < h.length){
+    if(h.startsWith('<span class="mth">', i)){ let depth = 0, j = i; do { const o = h.indexOf('<span', j), c = h.indexOf('</span>', j); if(o !== -1 && o < c){ depth++; j = o + 5; } else { depth--; j = c + 7; } } while(depth > 0 && j < h.length); out += h.slice(i, j); i = j; continue; }
+    if(h[i] === '<' && /[a-zA-Z\/]/.test(h[i+1] || '') && h.indexOf('>', i) > i){ const j = h.indexOf('>', i) + 1; out += h.slice(i, j); i = j; continue; }
+    let end = i + 1; while(end < h.length && !(h[end] === '<' && /[a-zA-Z\/]/.test(h[end+1] || ''))) end++;
+    out += mfixText(h.slice(i, end)); i = end;
+  }
+  return out;
+}
+function mfixQ(q){
+  const c = Object.assign({}, q);
+  ['q','exp','sent'].forEach(k=>{ if(c[k]) c[k] = mfix(c[k]); });
+  if(c.options) c.options = c.options.map(mfix);
+  if(c.type==='order') c.items = c.items.map(mfix);
+  if(c.type==='classify') c.items = c.items.map(([t,b])=>[mfix(t),b]);
+  if(c.pairs) c.pairs = c.pairs.map(([a,b])=>[mfix(a),mfix(b)]);
+  return c;
+}
+
 /* ---- flip cards ---- */
 const MAT_FC = [
   ['tabi3i','ما هي الأرقام التي نكتب بها الأعداد الطبيعية؟','الأرقام العشرة: 0، 1، 2، 3، 4، 5، 6، 7، 8، 9.'],
@@ -1709,7 +1734,7 @@ const MAT_FC = [
   ['tawazi','متى يكون مستقيمان متوازيين؟','إذا لم يلتقيا في أي نقطة: (d) // (d′). والمستقيمان المنطبقان متوازيان.'],
   ['tawazi','خاصية: (d) // (d′) و(L) ⊥ (d)، ماذا نستنتج؟','(L) ⊥ (d′): إذا عامد مستقيم أحد مستقيمين متوازيين فهو عمودي على الآخر.'],
   ['tawazi','خاصية: (d₁) ⊥ (d) و(d₂) ⊥ (d)، ماذا نستنتج؟','(d₁) // (d₂): المستقيمان العموديان على نفس المستقيم متوازيان.']
-];
+].map(([k,f,b])=>[k, mfix(f), mfix(b)]);
 
 /* ---- static questions ---- */
 const MAT_SM = [
@@ -1867,7 +1892,7 @@ function MAT_BANK(lvl){
     genMul(H), H ? genMulCount() : genMul(H),
     genEst(), genEst()
   ];
-  return (H ? MAT_SH : MAT_SM).concat(g);
+  return (H ? MAT_SH : MAT_SM).concat(g).map(mfixQ);
 }
 
 /* =========== مختبر الأعداد =========== */
@@ -2028,7 +2053,7 @@ function opsRender(){
   const f = $('#opin'); if(f) f.focus({preventScroll:true});
   document.querySelectorAll('#opskind [data-ok]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.ok===OPS_KIND)));
 }
-function opsBad(m){ sfx('bad'); const f=$('#opfb'); f.textContent=m; f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); }
+function opsBad(m){ sfx('bad'); const f=$('#opfb'); f.innerHTML=mfix(m); f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); }
 $('#opsbox').addEventListener('click', e=>{
   const O = OPS, b = e.target.closest('button'); if(!b) return;
   if(O.k==='×'){
@@ -2049,7 +2074,7 @@ $('#opsbox').addEventListener('click', e=>{
       let nx = e+1; const hiR = String(Math.floor(O.r)).length - 1;
       if(nx > Math.max(hiR, 0) && !O.carry){ O.done = true; sfx('win'); opsRender(); return; }
       if(nx > O.hiE){ O.done = true; sfx('win'); opsRender(); return; }
-      O.col = nx; sfx('good'); opsRender(); if(msg) $('#opfb').textContent = msg;
+      O.col = nx; sfx('good'); opsRender(); if(msg) $('#opfb').innerHTML = mfix(msg);
     } else opsBad(O.k==='+' ? `اجمع: ${ta} + ${tb}${c?' + 1 (المحتفظ به)':''}` : `اطرح: ${ta} − ${tb}${c?' − 1 (بسبب الاستعارة)':''}${ta < tb + c ? '، واستعر 10' : ''}`);
   }
 });
