@@ -1792,9 +1792,16 @@ $('#tabs').addEventListener('click', e=>{ const b=e.target.closest('[data-tab]')
 document.addEventListener('click', e=>{ const b=e.target.closest('[data-go]'); if(b && SUB) go(SUB+'-'+b.dataset.go); });
 $('#mapNext').addEventListener('click', ()=>go(SUB+'-'+SB().mapNext[0]));
 const MAPFILE = { islam:'education-islamique', science:'education-scientifique', physics:'physique-phenomenes-electriques', history:'histoire', geo:'geographie', civic:'5ap-education-civique' };
-$('#mapDl').addEventListener('click', ()=>{
+let DLNS;
+if(window.claude && typeof window.claude.use === 'function'){ window.claude.use('downloads').then(ns=>{ DLNS = ns; }).catch(()=>{ DLNS = null; }); }
+$('#mapDl').addEventListener('click', async ()=>{
+  const name = 'carte-mentale-' + (MAPFILE[SUB] || SUB) + '.jpg', src = SB().img;
+  if(DLNS){
+    try{ const blob = await (await fetch(src)).blob(); await DLNS.save({ filename:name, data:blob }); }catch(e){}
+    return;
+  }
   const a = document.createElement('a');
-  a.href = SB().img; a.download = 'carte-mentale-' + (MAPFILE[SUB] || SUB) + '.jpg';
+  a.href = src; a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
 });
 $('#mapPrint').addEventListener('click', ()=>{
