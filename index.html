@@ -246,6 +246,16 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sheetbar span{color:var(--muted);font-weight:700;font-size:15px}
 .sheet{display:block;width:100%;max-width:900px;margin-inline:auto;padding:0;border:2px solid var(--line);border-radius:18px;overflow:hidden;background:#FFFDF7;cursor:zoom-in;box-shadow:0 6px 24px rgba(0,0,0,.08)}
 .sheet img{display:block;width:100%;height:auto}
+.maptools{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.maptools .btn{min-height:50px;display:inline-flex;align-items:center;gap:8px}
+#printArea{display:none}
+@media print{
+  @page{size:A4 portrait;margin:8mm}
+  body > *:not(#app), #app > *:not(#printArea){display:none!important}
+  html,body{background:#fff!important}
+  #printArea{display:block!important}
+  #printArea img{display:block;width:100%;height:auto;max-height:280mm;object-fit:contain;margin:0 auto}
+}
 .savehint{text-align:center;color:var(--muted);font-weight:600;font-size:14px;margin:10px 0 0}
 .viewer{position:fixed;inset:0;z-index:50;background:rgba(10,14,12,.94);display:flex;flex-direction:column}
 .vbar{display:flex;gap:8px;justify-content:flex-start;padding:calc(10px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 10px max(12px, env(safe-area-inset-left, 0px))}
@@ -513,6 +523,10 @@ img{max-width:100%}
     <section id="v-map">
       <div class="sheetbar"><h2>الخريطة الذهنية</h2><span>اضغط على الورقة لتكبيرها</span></div>
       <button type="button" class="sheet" id="openSheet" aria-label="تكبير الخريطة الذهنية"><img id="sheetImg" alt=""></button>
+      <div class="maptools">
+        <button type="button" class="btn ghost" id="mapDl"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>تحميل</button>
+        <button type="button" class="btn ghost" id="mapPrint"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3"/><path d="M7 14h10v7H7z"/></svg>طباعة</button>
+      </div>
       <p class="savehint">على الهاتف: اضغط مطوّلًا على الصورة المكبّرة لحفظها.</p>
       <div class="cta"><button type="button" class="btn" id="mapNext"></button></div>
     </section>
@@ -606,6 +620,7 @@ img{max-width:100%}
     </div>
     <div class="vscroll"><img id="vimg" alt="الخريطة الذهنية مكبّرة"></div>
   </div>
+  <div id="printArea" aria-hidden="true"><img id="printImg" alt=""></div>
 </div>
 
 <script>
@@ -1776,6 +1791,17 @@ $('#swapSubj').addEventListener('click', ()=>go(nextSubj()+'-map'));
 $('#tabs').addEventListener('click', e=>{ const b=e.target.closest('[data-tab]'); if(b) go(SUB+'-'+b.dataset.tab); });
 document.addEventListener('click', e=>{ const b=e.target.closest('[data-go]'); if(b && SUB) go(SUB+'-'+b.dataset.go); });
 $('#mapNext').addEventListener('click', ()=>go(SUB+'-'+SB().mapNext[0]));
+const MAPFILE = { islam:'education-islamique', science:'education-scientifique', physics:'physique-phenomenes-electriques', history:'histoire', geo:'geographie', civic:'5ap-education-civique' };
+$('#mapDl').addEventListener('click', ()=>{
+  const a = document.createElement('a');
+  a.href = SB().img; a.download = 'carte-mentale-' + (MAPFILE[SUB] || SUB) + '.jpg';
+  document.body.appendChild(a); a.click(); a.remove();
+});
+$('#mapPrint').addEventListener('click', ()=>{
+  const im = $('#printImg'); im.src = SB().img; im.alt = SB().alt;
+  const go2 = ()=>{ try{ window.print(); }catch(e){} };
+  if(im.complete && im.naturalWidth) go2(); else im.onload = ()=>{ im.onload = null; go2(); };
+});
 window.addEventListener('hashchange', route);
 
 /* ================= sheet viewer ================= */
