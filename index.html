@@ -463,6 +463,16 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .txwin b{display:block;font-size:19px;color:var(--g3)}
 .txwin span{font-weight:700;color:var(--muted)}
 
+
+/* exam papers */
+.excard{border:2px solid var(--line);background:var(--surface);border-radius:22px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.excard b{font-size:20px;color:var(--navy)}
+.exbtns{display:flex;gap:10px;flex-wrap:wrap}
+.exbtns a{flex:1 1 130px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;border-radius:14px;font-weight:800;font-size:17px;text-decoration:none;border:2px solid var(--navy)}
+.exbtns a.ex{background:var(--navy);color:var(--on-acc)}
+.exbtns a.dv{background:var(--surface);color:var(--navy)}
+.exnote{margin:4px 0 0;text-align:center;color:var(--muted);font-weight:600;font-size:15px}
+
 .pop{animation:pop .35s ease}
 @keyframes pop{0%{transform:scale(.96);opacity:.6}100%{transform:none;opacity:1}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -1688,15 +1698,33 @@ const SB = () => SUBJ[SUB];
 const L = () => SB().L;
 
 /* ================= routing ================= */
+const EXAMS = [
+  ['maths','الرياضيات'],['arabe','اللغة العربية'],['francais','اللغة الفرنسية'],['anglais','اللغة الإنجليزية'],
+  ['physique','العلوم الفيزيائية والتكنولوجيا'],['svt','علوم الطبيعة والحياة'],['islamique','التربية الإسلامية'],
+  ['civique','التربية المدنية'],['histoire-geo','التاريخ والجغرافيا']
+];
+const EX_BASE = /github\.io$/.test(location.hostname) ? 'examens/' : 'https://smartkidz-svg.github.io/Revision-et-quiz-1er-annee-CEM/examens/';
+const EX_IC = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>';
+const PDF_IC = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>';
+function showExams(){
+  showSubjects();
+  $('#lvBack').hidden = false; $('#lvBack').dataset.to = 'y1am'; $('#lvBack').textContent = '→ السنة الأولى متوسط';
+  $('.shint').hidden = true;
+  $('#shTitle').textContent = 'مواضيع الاختبارات والفروض';
+  $('#shSub').textContent = 'السنة الأولى متوسط · الفصل الأول · اختر المادة';
+  $('#scards').innerHTML = EXAMS.map(([k,n])=>`<div class="excard"><b>${n}</b><div class="exbtns"><a class="ex" href="${EX_BASE}${k}-examens.pdf" target="_blank" rel="noopener">${PDF_IC}الاختبارات (8)</a><a class="dv" href="${EX_BASE}${k}-devoirs.pdf" target="_blank" rel="noopener">${PDF_IC}الفروض (8)</a></div></div>`).join('')
+    + '<p class="exnote">يُفتح كل ملف PDF في صفحة جديدة (يتطلب الاتصال بالإنترنت).</p>';
+}
 function showSubjects(lv){
   stopTimer(); closeV();
   $('#subjects').hidden = false; $('#subj').hidden = true; SUB = null;
   const L0 = LEVELS[lv];
-  $('#lvBack').hidden = !L0;
+  $('.shint').hidden = false;
+  $('#lvBack').hidden = !L0; $('#lvBack').dataset.to = ''; $('#lvBack').textContent = '→ كل السنوات';
   $('#shTitle').textContent = L0 ? L0.n : 'مراجعة دروسي';
   $('#shSub').textContent = L0 ? 'اختر المادة' : 'اختر السنة الدراسية';
   $('#scards').innerHTML = L0
-    ? L0.subj.map(k=>scard(k+'-map', SICON[k], SUBJ[k].title, SDESC[k], SUBJ[k].base)).join('')
+    ? L0.subj.map(k=>scard(k+'-map', SICON[k], SUBJ[k].title, SDESC[k], SUBJ[k].base)).join('') + (lv==='y1am' ? scard('exams1am', EX_IC, 'مواضيع الاختبارات والفروض', 'الفصل الأول · 9 مواد · 72 اختبارًا و72 فرضًا', 'var(--navy)') : '')
     : Object.entries(LEVELS).map(([k,o])=>scard(k, `<span class="lvn">${o.badge}</span>`, o.n, o.s, o.c)).join('');
   document.documentElement.style.removeProperty('--base');
   window.scrollTo(0,0);
@@ -1736,12 +1764,13 @@ function openSubject(s, v){
 function route(){
   const h = location.hash.slice(1);
   if(!h || LEVELS[h]) return showSubjects(h);
+  if(h==='exams1am') return showExams();
   const [s,v] = h.split('-');
   openSubject(s, v || 'map');
 }
 function go(h){ try{ history.replaceState(null,'', h ? '#'+h : location.pathname + location.search); }catch(e){ location.hash = h; } route(); }
 $('#scards').addEventListener('click', e=>{ const b=e.target.closest('[data-h]'); if(b) go(b.dataset.h); });
-$('#lvBack').addEventListener('click', ()=>go(''));
+$('#lvBack').addEventListener('click', ()=>go($('#lvBack').dataset.to || ''));
 $('#toSubjects').addEventListener('click', ()=>go(SB().lvl));
 $('#swapSubj').addEventListener('click', ()=>go(nextSubj()+'-map'));
 $('#tabs').addEventListener('click', e=>{ const b=e.target.closest('[data-tab]'); if(b) go(SUB+'-'+b.dataset.tab); });

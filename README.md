@@ -17,3 +17,7 @@ Application de révision, organisée par année scolaire. Chaque matière a une 
 Ouvrir l'application : https://smartkidz-svg.github.io/Revision-et-quiz-1er-annee-CEM/
 
 Les cartes mentales à imprimer sont dans le dossier `cartes/`.
+
+## Sujets d'examens et devoirs (1AM, trimestre 1)
+
+Dans l'application : 1ère année CEM → « مواضيع الاختبارات والفروض ». Les PDF sont dans le dossier `examens/` (un fichier d'examens et un fichier de devoirs par matière, 8 sujets chacun).
