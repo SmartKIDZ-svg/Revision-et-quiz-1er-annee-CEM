@@ -1554,6 +1554,7 @@ const GEO_H = [
 ];
 
 /* ----- activity: تمارين حساب الوقت ----- */
+const LTR = t => `<span class="mth">${t}</span>`;
 let TX = null, TX_HARD = false, TX_OK = 0, TX_FIRST = true;
 const p2 = n => String(n).padStart(2,'0');
 const dirW = d => d==='E' ? 'شرقًا' : 'غربًا';
@@ -1601,13 +1602,13 @@ function paintTX(){
     html += `<p>هل المدينتان في نفس الجهة أم في جهتين متعاكستين؟ ماذا نفعل؟</p>
       <div class="txch"><button type="button" class="btn ghost" data-op="sub">نطرح</button><button type="button" class="btn ghost" data-op="add">نجمع</button></div>
       <div class="txin" ${t.op?'':'hidden'}><label>الفرق = <input type="number" inputmode="numeric" id="txv" aria-label="الفرق بالدرجات"> خطًّا</label><button type="button" class="btn primary" data-chk="1">تحقّق</button></div>`;
-  } else html += `<p class="txdone">${t.same ? (t.a===0?`${t.b} − 0`:`${Math.max(t.a,t.b)} − ${Math.min(t.a,t.b)}`) : `${t.a} + ${t.b}`} = <b>${t.diff} خطًّا</b></p>`;
+  } else html += `<p class="txdone">${LTR(`${t.same ? (t.a===0?`${t.b} − 0`:`${Math.max(t.a,t.b)} − ${Math.min(t.a,t.b)}`) : `${t.a} + ${t.b}`} = <b>${t.diff}</b>`)} خطًّا</p>`;
   html += `</div>`;
   // step 2
   if(t.st>=1){
     html += `<div class="txs${t.st>1?' ok':''}"><h4>2. تحويل الخطوط إلى دقائق</h4>`;
-    if(t.st===1) html += `<p>نضرب عدد الخطوط في 4.</p><div class="txin"><label>${t.diff} × 4 = <input type="number" inputmode="numeric" id="txv" aria-label="عدد الدقائق"> دقيقة</label><button type="button" class="btn primary" data-chk="2">تحقّق</button></div>`;
-    else html += `<p class="txdone">${t.diff} × 4 = <b>${t.min} دقيقة</b> ← ${t.min} ÷ 60 = <b>${minTxt}</b></p>`;
+    if(t.st===1) html += `<p>نضرب عدد الخطوط في 4.</p><div class="txin"><label>${LTR(`${t.diff} × 4 =`)} <input type="number" inputmode="numeric" id="txv" aria-label="عدد الدقائق"> دقيقة</label><button type="button" class="btn primary" data-chk="2">تحقّق</button></div>`;
+    else html += `<p class="txdone">${LTR(`${t.diff} × 4 = <b>${t.min}</b>`)} دقيقة، أي <b>${minTxt}</b></p>`;
     html += `</div>`;
   }
   // step 3
@@ -1617,7 +1618,7 @@ function paintTX(){
       html += `<p>هل المدينة ب شرق المدينة أ أم غربها؟</p>
         <div class="txch"><button type="button" class="btn ghost" data-dir="E">شرقًا ← نضيف</button><button type="button" class="btn ghost" data-dir="W">غربًا ← ننقص</button></div>
         <div class="txin" ${t.dir?'':'hidden'}><label>الساعة: <input type="number" inputmode="numeric" id="txh" aria-label="الساعة" min="0" max="23"> : <input type="number" inputmode="numeric" id="txm" aria-label="الدقائق" min="0" max="59" value="${TX_HARD?'':'0'}"></label><button type="button" class="btn primary" data-chk="3">تحقّق</button></div>`;
-    } else html += `<p class="txdone">${p2(t.h)}:${p2(t.m)} ${t.east?'+':'−'} ${minTxt} = <b class="tnum">${p2(hh)}:${p2(mm)}</b></p>`;
+    } else html += `<p class="txdone">${LTR(`${p2(t.h)}:${p2(t.m)} ${t.east?'+':'−'} ${p2(Math.floor(t.min/60))}:${p2(t.min%60)} = <b>${p2(hh)}:${p2(mm)}</b>`)}</p>`;
     html += `</div>`;
   }
   if(t.st===3) html += `<div class="txwin">${FEN('joy',90)}<div><b>أحسنت! الساعة في المدينة ب هي ${p2(hh)}:${p2(mm)}</b><span>تمارين محلولة: ${TX_OK}</span></div></div>`;
@@ -2150,6 +2151,7 @@ $('#geobox').addEventListener('click', e=>{
 $('#geonew').addEventListener('click', geoNew);
 
 const FCSETS = { islam:ISL_FC, science:SCI_FC, physics:PHY_FC, civic:FCARDS, history:HIS_FC, geo:GEO_FC, math:MAT_FC };
+Object.keys(FCSETS).forEach(k=>{ FCSETS[k] = FCSETS[k].map(([l,f,b])=>[l, mfix(f), mfix(b)]); });
 let FC_KNOWN = new Set();
 let ACC_OPEN = new Set();
 const CHEV = '<svg class="acc-ch" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
@@ -2596,7 +2598,7 @@ const fmt = x => String(Math.round(x*10)/10);
 const bkey = f => `rv-best-${SUB}-${LVL}-${f}`;
 
 function prep(q){
-  const c = Object.assign({}, q, { pick:null, multi:[], sel:null, done:false, frac:0, earned:0, left:null, timeout:false });
+  const c = Object.assign({}, mfixQ(q), { pick:null, multi:[], sel:null, done:false, frac:0, earned:0, left:null, timeout:false });
   c.pts = ['match','order','classify'].includes(q.type) ? 2 : 1;
   if(q.type==='mcq' || q.type==='fill') c.opts = shuffle(q.options.map((t,k)=>({t, ok:k===0})));
   if(q.type==='multi') c.opts = shuffle(q.options.map((t,k)=>({t, ok:q.correct.includes(k)})));
