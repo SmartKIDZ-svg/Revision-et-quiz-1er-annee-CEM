@@ -15,6 +15,7 @@ Application de révision, organisée par année scolaire. Chaque matière a une 
 ## السنة الخامسة ابتدائي (5AP)
 
 - **التربية المدنية** — الحياة الجماعية : carte mentale (المؤسسات العمومية الخدماتية، بريد الجزائر، اتصالات الجزائر، وسائل الإعلام، وسائل الاتصال), cartes-mémoire à retourner, quiz à deux niveaux.
+- **التربية العلمية (5AP)** — الاحتراق والكهرباء : carte mentale, labo « مختبري » (flamme selon l'oxygène, ascenseur électrique avec inverseur, situations sûres ou dangereuses), cartes de mémorisation, quiz à deux niveaux.
 
 Ouvrir l'application : https://smartkidz-svg.github.io/Revision-et-quiz-1er-annee-CEM/
 
