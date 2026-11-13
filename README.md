@@ -16,6 +16,7 @@ Application de révision, organisée par année scolaire. Chaque matière a une 
 
 - **التربية المدنية** — الحياة الجماعية : carte mentale (المؤسسات العمومية الخدماتية، بريد الجزائر، اتصالات الجزائر، وسائل الإعلام، وسائل الاتصال), cartes-mémoire à retourner, quiz à deux niveaux.
 - **التربية العلمية (5AP)** — الاحتراق والكهرباء : carte mentale, labo « مختبري » (flamme selon l'oxygène, ascenseur électrique avec inverseur, situations sûres ou dangereuses), cartes de mémorisation, quiz à deux niveaux.
+- **الجغرافيا (5AP)** — البلدية والولاية, الموقع الفلكي, موقع الجزائر, مظاهر السطح, المناخ والنبات, التصحر والجفاف : carte mentale, activité « مستكشف الجزائر » (placer les villes sur la carte des climats, classer les reliefs, solutions désertification/sécheresse), cartes de mémorisation, quiz à deux niveaux.
 
 Ouvrir l'application : https://smartkidz-svg.github.io/Revision-et-quiz-1er-annee-CEM/
 
