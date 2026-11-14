@@ -434,6 +434,19 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .tlbox{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:16px 18px;margin:18px 0}
 .tlbox h3{margin:0 0 10px;color:var(--base);font-size:22px}
 .tlrow{display:flex;height:40px;border-radius:999px;overflow:hidden;font-size:clamp(11px,2.8vw,15px);font-weight:800;color:#fff}
+.tlb{position:relative;display:flex;flex-direction:column;gap:8px;padding-inline-start:18px;margin:6px 0 12px}
+.tlb::before{content:"";position:absolute;inset-inline-start:6px;top:8px;bottom:8px;width:5px;border-radius:9px;background:linear-gradient(var(--h4),var(--h2))}
+.tlbs{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:8px;text-align:start;background:var(--surface);border:2px dashed var(--line);border-radius:14px;padding:8px 10px;font:inherit;color:var(--ink);cursor:pointer;min-height:52px}
+.tlbs::before{content:"";position:absolute;inset-inline-start:-19px;top:50%;width:13px;height:13px;margin-top:-7px;border-radius:50%;background:var(--surface);border:3px solid var(--hist)}
+.tlbs.good{border-style:solid;border-color:#15803D;background:color-mix(in srgb,#15803D 10%,var(--surface))}
+.tlbs.bad{border-style:solid;border-color:#E8453C;background:color-mix(in srgb,#E8453C 10%,var(--surface))}
+.tlbd{color:#fff;font-weight:800;font-size:13px;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.tlbv{font-weight:800;font-size:15px}
+.tlbv i{font-style:normal;color:var(--muted,#8a8a8a)}
+.tlbs small{flex-basis:100%;font-size:13px;font-weight:700;color:#15803D}
+.tlbpool{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:8px}
+.tlbc{font:inherit;font-weight:800;font-size:14px;border:2px solid var(--hist);color:var(--hist);background:var(--surface);border-radius:999px;padding:8px 14px;cursor:pointer}
+.tlbc.on{background:var(--hist);color:#fff;transform:scale(1.06)}
 .erbar{display:flex;gap:4px;margin-bottom:10px}
 .erbar span{flex:1;text-align:center;font-size:clamp(11px,2.9vw,14px);font-weight:800;padding:6px 2px;border-radius:10px;background:var(--surface);border:2px solid var(--line);transition:all .3s}
 .erbar span.on{background:var(--hist);color:#fff;border-color:var(--hist);transform:scale(1.06)}
@@ -675,7 +688,7 @@ img{max-width:100%}
 
     <section id="v-eras" class="narrow" hidden>
       <div class="circintro"><h2>آلة الزمن</h2><p>انسب كل ميزة إلى عصرها، صنّف الآثار، واكتشف أين عاش إنسان ما قبل التاريخ.</p></div>
-      <div class="nlpick" id="erpick"><button type="button" data-er="era" aria-pressed="true">عصور ما قبل التاريخ</button><button type="button" data-er="type" aria-pressed="false">مادي أم مكتوب؟</button><button type="button" data-er="home" aria-pressed="false">أين عاش؟</button></div>
+      <div class="nlpick" id="erpick"><button type="button" data-er="tl" aria-pressed="true">ابنِ خط الزمن</button><button type="button" data-er="era" aria-pressed="false">عصور ما قبل التاريخ</button><button type="button" data-er="type" aria-pressed="false">مادي أم مكتوب؟</button><button type="button" data-er="home" aria-pressed="false">أين عاش؟</button></div>
       <div id="erbox" aria-live="polite"></div>
       <div class="labtools"><button type="button" class="btn ghost" id="ernew">جولة جديدة</button><button type="button" class="btn primary" data-go="cards">بطاقات الحفظ</button></div>
     </section>
@@ -2729,6 +2742,53 @@ HIS_FC.push(
   ['athar','صنّف آثار ما قبل التاريخ (الإدماج)','آثار مادية: البنايات، الجمجمة، الأواني الفخارية، الأدوات الحجرية، العملات والمسكوكات. آثار مكتوبة: الرسومات الصخرية، خط التيفيناغ.']
 );
 
+/* ----- خط الزمن ----- */
+HIS_FC.push(
+  ['zaman','ماذا حدث حوالي 2 مليون سنة ق.م؟','ظهور الإنسان على سطح الأرض وبداية العصر الحجري القديم.'],
+  ['zaman','ماذا حدث حوالي 12000 ق.م؟','نهاية العصر الحجري القديم وبداية العصر الحجري الوسيط.'],
+  ['zaman','ماذا حدث حوالي 8000 ق.م؟','نهاية العصر الحجري الوسيط وبداية العصر الحجري الحديث.'],
+  ['zaman','ماذا حدث حوالي 4000 ق.م؟','بداية العصر المعدني: البرونز والحديد والنحاس.'],
+  ['zaman','ماذا حدث حوالي 3200 ق.م؟','اختراع الكتابة: نهاية ما قبل التاريخ وبداية التاريخ.'],
+  ['zaman','رتّب العصور على خط الزمن','الحجري القديم (2 مليون ← 12000 ق.م) ← الحجري الوسيط (12000 ← 8000) ← الحجري الحديث (8000 ← 4000) ← المعدني (من 4000) ← التاريخ (3200 ق.م).'],
+  ['zaman','كيف أقرأ التواريخ قبل الميلاد؟','كلما كان الرقم أكبر كان الحدث أقدم: 12000 ق.م أقدم من 8000 ق.م.']
+);
+const TLB_SLOTS = [
+  { d:'حوالي 2 مليون سنة ق.م', era:'ظهور الإنسان', ev:['ظهور الإنسان على الأرض'] },
+  { d:'2 مليون ← 12000 ق.م', era:'العصر الحجري القديم', ev:['السكن في الكهوف','اكتشاف النار','التقاط الثمار وصيد الحيوانات','النقش على الصخور'] },
+  { d:'12000 ← 8000 ق.م', era:'العصر الحجري الوسيط', ev:['بناء الأكواخ','استئناس الحيوانات','الشروع في الزراعة','صقل الحجارة'] },
+  { d:'8000 ← 4000 ق.م', era:'العصر الحجري الحديث', ev:['طحن الحبوب','حياكة الملابس','ممارسة الرعي والزراعة'] },
+  { d:'من 4000 ق.م', era:'العصر المعدني', ev:['استخدام البرونز','استخدام الحديد والنحاس'] },
+  { d:'حوالي 3200 ق.م', era:'اختراع الكتابة', ev:['اختراع الكتابة: بداية التاريخ'] }
+];
+const TLB_COL = ['#7C2D12','var(--h4)','#E07A5F','#C2410C','#78716C','var(--h2)'];
+let TLB = null;
+function tlbNew(){
+  const kind = TLB && TLB.kind==='era' ? 'ev' : 'era';
+  const ans = TLB_SLOTS.map(s => kind==='era' ? s.era : s.ev[Math.floor(Math.random()*s.ev.length)]);
+  TLB = { kind, ans, put: ans.map(()=>null), pool: shuffle(ans.map((a,i)=>i)), sel:null, done:false };
+  tlbRender();
+}
+function tlbRender(){
+  const T = TLB, box = $('#erbox');
+  const ok = T.done ? T.put.filter((p,i)=>p===i).length : 0;
+  let h = `<p class="estn">${T.kind==='era'?'ضع كل عصر في مكانه على خط الزمن':'ضع كل حدث في مكانه على خط الزمن'} (الأقدم في الأعلى) · اختر بطاقة ثم اضغط على مكانها</p><div class="tlb">`;
+  h += TLB_SLOTS.map((s,i)=>{ const p = T.put[i], st = T.done ? (p===i?' good':' bad') : '';
+    return `<button type="button" class="tlbs${st}" data-tlbs="${i}"><span class="tlbd" style="background:${TLB_COL[i]}">${s.d}</span><span class="tlbv">${p==null?'<i>؟</i>':T.ans[p]}</span>${T.done&&p!==i?`<small>الصحيح: ${T.ans[i]}</small>`:''}</button>`; }).join('');
+  h += '</div>';
+  if(!T.done){
+    h += `<div class="tlbpool">${T.pool.filter(k=>!T.put.includes(k)).map(k=>`<button type="button" class="tlbc${T.sel===k?' on':''}" data-tlbc="${k}">${T.ans[k]}</button>`).join('')}</div>`;
+    const full = T.put.every(p=>p!=null);
+    h += `<div class="labtools"><button type="button" class="btn primary" id="tlbchk" ${full?'':'disabled'}>تحقّق</button></div>`;
+  } else {
+    h += `<div class="txwin">${FEN(ok===6?'joy':'happy',80)}<div><b>${ok} / 6 في مكانها الصحيح</b><span>${ok===6?'ممتاز! خط الزمن في ذاكرتك.':'انظر إلى التصحيح وأعد المحاولة.'}</span></div></div><div class="labtools"><button type="button" class="btn primary" id="tlbnext">${T.kind==='era'?'الآن: الأحداث':'الآن: العصور'}</button></div>`;
+  }
+  box.innerHTML = h;
+}
+
+/* ===== extra questions (min 10 per lesson) ===== */
+HIS_M.push(...[{"l": "zaman", "type": "mcq", "q": "ما أقدم حدث على خط الزمن؟", "options": ["ظهور الإنسان (حوالي 2 مليون سنة ق.م)", "اختراع الكتابة (3200 ق.م)", "بداية العصر المعدني (4000 ق.م)"], "exp": "كلما كبر الرقم قبل الميلاد كان الحدث أقدم."}, {"l": "zaman", "type": "mcq", "q": "ماذا حدث حوالي 3200 ق.م؟", "options": ["اختراع الكتابة", "اكتشاف النار", "بناء الأكواخ"], "exp": "بداية التاريخ."}, {"l": "zaman", "type": "mcq", "q": "ماذا يبدأ حوالي 12000 ق.م؟", "options": ["العصر الحجري الوسيط", "العصر المعدني", "التاريخ"], "exp": "ينتهي القديم ويبدأ الوسيط."}, {"l": "zaman", "type": "mcq", "q": "ماذا يبدأ حوالي 8000 ق.م؟", "options": ["العصر الحجري الحديث", "العصر الحجري القديم", "العصر المعدني"], "exp": "من 8000 إلى 4000 ق.م."}, {"l": "zaman", "type": "mcq", "q": "ماذا يبدأ حوالي 4000 ق.م؟", "options": ["العصر المعدني", "العصر الحجري الوسيط", "العصر الحجري القديم"], "exp": "استخدام المعادن."}, {"l": "zaman", "type": "tf", "q": "العصر الحجري الوسيط يأتي بين 12000 ق.م و8000 ق.م.", "answer": true, "exp": "صحيح."}, {"l": "zaman", "type": "tf", "q": "8000 ق.م أقدم من 12000 ق.م.", "answer": false, "exp": "خطأ، 12000 ق.م أقدم (الرقم أكبر قبل الميلاد)."}, {"l": "zaman", "type": "fill", "q": "اختر الكلمة الناقصة", "sent": "العصر الذي يأتي بين الحجري الوسيط والمعدني هو العصر الحجري ___", "options": ["الحديث", "القديم", "الوسيط"], "exp": "القديم ← الوسيط ← الحديث ← المعدني."}, {"l": "zaman", "type": "mcq", "q": "أطول عصر في خط الزمن هو:", "options": ["العصر الحجري القديم", "العصر الحجري الوسيط", "العصر الحجري الحديث"], "exp": "من 2 مليون سنة إلى 12000 ق.م."}, {"l": "zaman", "type": "mcq", "q": "ماذا يفصل ما قبل التاريخ عن التاريخ على خط الزمن؟", "options": ["اختراع الكتابة", "اكتشاف النار", "طحن الحبوب"], "exp": "حوالي 3200 ق.م."}, {"l": "zaman", "type": "order", "q": "رتّب التواريخ من الأقدم إلى الأحدث", "items": ["2 مليون سنة ق.م", "12000 ق.م", "8000 ق.م", "4000 ق.م", "3200 ق.م"], "exp": "قبل الميلاد: الرقم الأكبر أقدم."}]);
+HIS_H.push(...[{"l": "zaman", "type": "order", "q": "رتّب على خط الزمن من الأقدم إلى الأحدث", "items": ["السكن في الكهوف واكتشاف النار", "بناء الأكواخ واستئناس الحيوانات", "طحن الحبوب وحياكة الملابس", "استخدام البرونز والحديد", "اختراع الكتابة"], "exp": "من القديم إلى بداية التاريخ."}, {"l": "zaman", "type": "match", "q": "صِل كل تاريخ بما حدث فيه", "pairs": [["2 مليون سنة ق.م", "ظهور الإنسان"], ["12000 ق.م", "بداية العصر الحجري الوسيط"], ["8000 ق.م", "بداية العصر الحجري الحديث"], ["4000 ق.م", "بداية العصر المعدني"], ["3200 ق.م", "اختراع الكتابة"]], "exp": "خط الزمن."}, {"l": "zaman", "type": "mcq", "q": "كم سنة بين بداية العصر المعدني (4000 ق.م) واختراع الكتابة (3200 ق.م)؟", "options": ["800 سنة", "7200 سنة", "1000 سنة"], "exp": "4000 − 3200 = 800 سنة."}, {"l": "zaman", "type": "mcq", "q": "كم سنة بين بداية العصر الحجري الوسيط (12000 ق.م) وبداية العصر الحجري الحديث (8000 ق.م)؟", "options": ["4000 سنة", "20000 سنة", "8000 سنة"], "exp": "12000 − 8000 = 4000 سنة."}, {"l": "zaman", "type": "mcq", "q": "كم سنة بين بداية العصر الحجري الحديث (8000 ق.م) واختراع الكتابة (3200 ق.م)؟", "options": ["4800 سنة", "11200 سنة", "5200 سنة"], "exp": "8000 − 3200 = 4800 سنة."}, {"l": "zaman", "type": "tf", "q": "على خط الزمن قبل الميلاد، كلما صغر الرقم كان الحدث أحدث.", "answer": true, "exp": "صحيح: 3200 ق.م أحدث من 8000 ق.م."}, {"l": "zaman", "type": "classify", "q": "صنّف كل حدث", "bins": ["قبل 8000 ق.م", "بعد 8000 ق.م"], "items": [["اكتشاف النار", 0], ["بناء الأكواخ", 0], ["طحن الحبوب", 1], ["استخدام البرونز", 1], ["اختراع الكتابة", 1]], "exp": "8000 ق.م بداية العصر الحجري الحديث."}, {"l": "zaman", "type": "mcq", "q": "في أي عصر عاش إنسان استعمل البرونز حوالي 3500 ق.م؟", "options": ["العصر المعدني", "العصر الحجري الوسيط", "العصر الحجري القديم"], "exp": "3500 بين 4000 و3200 ق.م."}, {"l": "zaman", "type": "mcq", "q": "أثر عمره حوالي 10000 سنة ق.م. ينتمي إلى العصر:", "options": ["الحجري الوسيط", "الحجري الحديث", "المعدني"], "exp": "10000 بين 12000 و8000 ق.م."}, {"l": "zaman", "type": "fill", "q": "اختر الكلمة الناقصة", "sent": "يأتي العصر المعدني بين 4000 ق.م و___ ق.م (اختراع الكتابة)", "options": ["3200", "8000", "12000"], "exp": "بعده يبدأ التاريخ."}, {"l": "zaman", "type": "order", "q": "رتّب العصور على خط الزمن", "items": ["العصر الحجري القديم", "العصر الحجري الوسيط", "العصر الحجري الحديث", "العصر المعدني", "التاريخ"], "exp": "الكتابة تفتح التاريخ."}]);
+
 /* ----- آلة الزمن ----- */
 const ER_B = ['الحجري القديم','الحجري الوسيط','الحجري الحديث','المعدني'];
 const ER_ERA = [
@@ -2747,7 +2807,7 @@ const ER_HOME = [
 ];
 let ERT = 'era', ERR = null;
 function erSet(){ return ERT==='era' ? { list:ER_ERA, bins:ER_B, h:'إلى أي عصر تنتمي هذه الميزة؟' } : ERT==='type' ? { list:ER_TYPE, bins:['أثر مادي','أثر مكتوب'], h:'ما نوع هذا الأثر؟' } : { list:ER_HOME, bins:['موطن للإنسان القديم','ليس موطنًا قديمًا'], h:'هل عاش فيه إنسان ما قبل التاريخ؟' }; }
-function erShow(t){ ERT = t; document.querySelectorAll('#erpick [data-er]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.er===t))); erNew(); }
+function erShow(t){ ERT = t; document.querySelectorAll('#erpick [data-er]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.er===t))); if(t==='tl'){ TLB = null; tlbNew(); } else erNew(); }
 function erNew(){ const S = erSet(); ERR = { list: shuffle(S.list.map((s,i)=>i)).slice(0,8), i:0, ok:0, ans:null }; erRender(); }
 function erBar(){
   const k = ERT==='era' && ERR.ans!=null ? erSet().list[ERR.list[ERR.i]][1] : -1;
@@ -2769,7 +2829,18 @@ $('#erbox').addEventListener('click', e=>{
   if(b && Q.ans==null){ const it = erSet().list[Q.list[Q.i]]; Q.ans = +b.dataset.era; if(Q.ans===it[1]){ Q.ok++; sfx('good'); } else sfx('bad'); erRender(); return; }
   if(e.target.closest('#ernext')){ Q.i++; Q.ans = null; erRender(); }
 });
-$('#ernew').addEventListener('click', erNew);
+$('#ernew').addEventListener('click', ()=>{ if(ERT==='tl'){ TLB = null; tlbNew(); } else erNew(); });
+$('#erbox').addEventListener('click', e=>{
+  if(ERT!=='tl' || !TLB) return; const T = TLB;
+  const c = e.target.closest('[data-tlbc]'), sl = e.target.closest('[data-tlbs]');
+  if(c && !T.done){ T.sel = +c.dataset.tlbc; sfx('part'); tlbRender(); return; }
+  if(sl && !T.done){ const i = +sl.dataset.tlbs;
+    if(T.sel!=null){ T.put = T.put.map(p=>p===T.sel?null:p); T.put[i] = T.sel; T.sel = null; }
+    else if(T.put[i]!=null){ T.put[i] = null; }
+    tlbRender(); return; }
+  if(e.target.closest('#tlbchk')){ T.done = true; const ok = T.put.filter((p,i)=>p===i).length; sfx(ok===6?'win':ok>=4?'part':'bad'); tlbRender(); return; }
+  if(e.target.closest('#tlbnext')){ tlbNew(); }
+});
 
 /* ===== extra questions (min 10 per lesson) ===== */
 HIS_M.push(...[{"l": "usur", "type": "mcq", "q": "ثاني عصور ما قبل التاريخ هو:", "options": ["العصر الحجري الوسيط", "العصر الحجري الحديث", "العصر المعدني"], "exp": "القديم ← الوسيط ← الحديث ← المعدني."}, {"l": "usur", "type": "mcq", "q": "يمتد العصر الحجري الوسيط من حوالي:", "options": ["12000 ق.م إلى 8000 ق.م", "2 مليون سنة ق.م إلى 12000 ق.م", "8000 ق.م إلى 4000 ق.م"], "exp": "حسب الدرس."}, {"l": "usur", "type": "tf", "q": "في العصر الحجري الوسيط بنى الإنسان الأكواخ.", "answer": true, "exp": "صحيح، وتطورت أدواته ومسكنه."}, {"l": "usur", "type": "mcq", "q": "استئناس الحيوانات بدأ في العصر:", "options": ["الحجري الوسيط", "الحجري القديم", "المعدني"], "exp": "مع اعتدال المناخ."}, {"l": "usur", "type": "fill", "q": "اختر الكلمة الناقصة", "sent": "في العصر الحجري الوسيط بدأ ___ الحجارة", "options": ["صقل", "كسر", "بيع"], "exp": "صقل الحجارة."}, {"l": "usur", "type": "mcq", "q": "ظهرت عملية طحن الحبوب وحياكة الملابس في العصر:", "options": ["الحجري الحديث", "الحجري القديم", "الحجري الوسيط"], "exp": "العصر الحجري الحديث."}, {"l": "usur", "type": "mcq", "q": "يمتد العصر الحجري الحديث من حوالي:", "options": ["8000 ق.م إلى 4000 ق.م", "12000 ق.م إلى 8000 ق.م", "4000 ق.م إلى اليوم"], "exp": "حسب الدرس."}, {"l": "usur", "type": "tf", "q": "في العصر المعدني انتقل الإنسان من استخدام الحجارة إلى استخدام المعادن.", "answer": true, "exp": "صحيح."}, {"l": "usur", "type": "multi", "q": "ما المعادن التي استعملها الإنسان في العصر المعدني؟ (كل الإجابات الصحيحة)", "options": ["البرونز", "الحديد", "النحاس", "البلاستيك"], "correct": [0, 1, 2], "exp": "البلاستيك اختراع حديث."}, {"l": "usur", "type": "mcq", "q": "في العصر الحجري الوسيط أصبح المناخ:", "options": ["معتدلًا", "شديد البرودة", "شديد الحرارة"], "exp": "اعتدال المناخ واختفاء الحيوانات الكبيرة."}, {"l": "usur", "type": "tf", "q": "مارس الإنسان الرعي والزراعة في العصر الحجري الحديث.", "answer": true, "exp": "صحيح."}, {"l": "usur", "type": "mcq", "q": "العصر الذي يلي العصر الحجري الحديث هو:", "options": ["العصر المعدني", "العصر الحجري القديم", "العصر الحجري الوسيط"], "exp": "يبدأ حوالي 4000 ق.م."}, {"l": "mawatin", "type": "mcq", "q": "مواطن إنسان ما قبل التاريخ هي:", "options": ["المناطق التي عاش فيها الإنسان قديمًا وتتواجد فيها مخلّفاته الأثرية", "المدن الحديثة", "المتاحف"], "exp": "تعريف الدرس."}, {"l": "mawatin", "type": "tf", "q": "الكهوف والمغارات من مواطن إنسان ما قبل التاريخ.", "answer": true, "exp": "صحيح."}, {"l": "mawatin", "type": "mcq", "q": "عاش الإنسان قديمًا على ضفاف:", "options": ["الأنهار والبحيرات", "الطرق السريعة", "المطارات"], "exp": "قرب الماء."}, {"l": "mawatin", "type": "multi", "q": "ما مواطن إنسان ما قبل التاريخ؟ (كل الإجابات الصحيحة)", "options": ["الكهوف والمغارات", "ضفاف الأنهار والبحيرات", "سواحل البحار ومنابع المياه", "العمارات الحديثة"], "correct": [0, 1, 2], "exp": "العمارات حديثة."}, {"l": "mawatin", "type": "fill", "q": "اختر الكلمة الناقصة", "sent": "من مواطن الإنسان القديم المناطق ذات المناخ ___", "options": ["المعتدل", "الجليدي", "البركاني"], "exp": "مثل صحراء الجزائر قديمًا."}, {"l": "mawatin", "type": "mcq", "q": "من أمثلة المناطق ذات المناخ المعتدل التي عاش فيها الإنسان:", "options": ["صحراء الجزائر", "القطب الشمالي", "قاع البحر"], "exp": "ما زالت تُدرس من طرف العلماء."}, {"l": "mawatin", "type": "tf", "q": "عاش الإنسان القديم قرب منابع المياه.", "answer": true, "exp": "صحيح، لأن الماء ضروري للحياة."}, {"l": "mawatin", "type": "mcq", "q": "لماذا اختار الإنسان القديم العيش قرب الأنهار؟", "options": ["للحصول على الماء والغذاء", "لركوب السفن الكبيرة", "لبناء المصانع"], "exp": "الماء ضروري، والحيوانات تأتي لتشرب."}, {"l": "mawatin", "type": "tf", "q": "مواطن إنسان ما قبل التاريخ لم تعد تُدرس اليوم.", "answer": false, "exp": "خطأ، ما زالت تُدرس من طرف العلماء."}, {"l": "mawatin", "type": "mcq", "q": "سكن الإنسان في الكهوف لـ:", "options": ["يحتمي من البرد والحيوانات", "يزرع القمح داخلها", "يصنع المعادن"], "exp": "الكهف مأوى."}, {"l": "athar", "type": "classify", "q": "حسب الإدماج: صنّف آثار ما قبل التاريخ", "bins": ["آثار مادية", "آثار مكتوبة"], "items": [["البنايات", 0], ["الجمجمة", 0], ["الأدوات الحجرية", 0], ["الرسومات الصخرية", 1], ["خط التيفيناغ", 1]], "exp": "تمرين الإدماج."}]);
@@ -2903,7 +2974,7 @@ SUBJ.history = {
   alt:'الخريطة الذهنية للتاريخ: الآثار وأنواعها، الخطوات المنهجية لدراسة الآثار، مصطلحات، ما قبل التاريخ، عصور ما قبل التاريخ (القديم، الوسيط، الحديث، المعدني)، مواطن الإنسان، تصنيف الآثار، خط الزمن',
   tabs:[['map','الخريطة الذهنية'],['dig','رحلة عالم الآثار'],['eras','آلة الزمن'],['cards','بطاقات الحفظ'],['quiz','المسابقة']],
   mapNext:['dig','ابدأ رحلة عالم الآثار'],
-  L:{ athar:{n:'الآثار وأنواعها',d:'الوضعية 1',c:'var(--h1)'}, khutuwat:{n:'خطوات دراسة الآثار',d:'الوضعية 1',c:'var(--h2)'}, mustalahat:{n:'مصطلحات',d:'إدماج',c:'var(--h3)'}, qabl:{n:'ما قبل التاريخ والعصر الحجري القديم',d:'الوضعية 2',c:'var(--h4)'}, usur:{n:'عصور ما قبل التاريخ',d:'الوضعية 2',c:'var(--e5)'}, mawatin:{n:'مواطن إنسان ما قبل التاريخ',d:'الوضعية 2',c:'var(--e6)'} },
+  L:{ athar:{n:'الآثار وأنواعها',d:'الوضعية 1',c:'var(--h1)'}, khutuwat:{n:'خطوات دراسة الآثار',d:'الوضعية 1',c:'var(--h2)'}, mustalahat:{n:'مصطلحات',d:'إدماج',c:'var(--h3)'}, qabl:{n:'ما قبل التاريخ والعصر الحجري القديم',d:'الوضعية 2',c:'var(--h4)'}, usur:{n:'عصور ما قبل التاريخ',d:'الوضعية 2',c:'var(--e5)'}, mawatin:{n:'مواطن إنسان ما قبل التاريخ',d:'الوضعية 2',c:'var(--e6)'}, zaman:{n:'خط الزمن',d:'الوضعية 2',c:'#7C2D12'} },
   banks:{ mid:HIS_M, hard:HIS_H }, heroSmall:'التاريخ · علم الآثار وما قبل التاريخ', heroTitle:'مسابقة التاريخ',
   top:'ممتاز! أنت مؤرخ صغير', allLabel:'كل الدروس'
 };
@@ -3054,7 +3125,7 @@ function openSubject(s, v){
     S = null; qhome(false);
     if(SUB==='science') renderLab();
     if(SUB==='physics') renderCirc();
-    if(SUB==='history'){ DIG_I = 0; TL_I = 0; renderDig(); erShow('era'); }
+    if(SUB==='history'){ DIG_I = 0; TL_I = 0; renderDig(); erShow('tl'); }
     if(SUB==='geo'){ TX_FIRST = true; TX_HARD = false; TX_OK = 0; newTimeEx(); w1Show('zone'); }
     if(SUB==='civ1') sitNew();
     if(SUB==='geo5') g5Show('clim');
