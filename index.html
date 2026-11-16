@@ -282,6 +282,17 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .stxt b{font-size:28px;font-weight:700;color:var(--acc);line-height:1.4}
 .stxt span{font-size:16px;font-weight:600;color:var(--muted);line-height:1.6}
 .sgo{flex:0 0 auto;font-size:30px;font-weight:700;color:var(--acc)}
+.scards.sq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:640px){.scards.sq{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.scards.sq .scard{flex-direction:column;justify-content:center;text-align:center;aspect-ratio:1/1;min-height:0;padding:14px 10px;gap:10px;border-radius:24px;background:color-mix(in srgb, var(--acc) 7%, var(--surface));border-color:color-mix(in srgb, var(--acc) 28%, var(--line))}
+.scards.sq .sicon{width:64px;height:64px;border-radius:20px}
+.scards.sq .sicon svg{width:34px;height:34px}
+.scards.sq .stxt{flex:0 0 auto;align-items:center}
+.scards.sq .stxt b{font-size:clamp(17px,4.6vw,22px);line-height:1.35}
+.scards.sq .stxt span{font-size:12.5px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.scards.sq .sgo{display:none}
+.scards.sq .scard[data-h^="exams"]{grid-column:1/-1;aspect-ratio:auto;flex-direction:row;text-align:start;min-height:96px}
+.scards.sq .scard[data-h^="exams"] .stxt{flex:1 1 auto;align-items:flex-start}
 .shint{text-align:center;color:var(--muted);font-weight:600;margin:0;font-size:15px}
 .subjbar{display:flex;align-items:center;gap:10px}
 .subjbar h1{flex:1 1 auto;font-size:26px;font-weight:700;color:var(--base);line-height:1.4;min-width:0}
@@ -3498,6 +3509,7 @@ function showSubjects(lv){
   $('#lvBack').hidden = !L0; $('#lvBack').dataset.to = ''; $('#lvBack').textContent = '→ كل السنوات';
   $('#shTitle').textContent = L0 ? L0.n : 'مراجعة دروسي';
   $('#shSub').textContent = L0 ? 'اختر المادة' : 'اختر السنة الدراسية';
+  $('#scards').classList.toggle('sq', !!L0);
   $('#scards').innerHTML = L0
     ? L0.subj.map(k=>scard(k+'-map', SICON[k], SUBJ[k].title, SDESC[k], SUBJ[k].base)).join('') + (lv==='y1am' ? scard('exams1am', EX_IC, 'مواضيع الاختبارات والفروض', 'الفصل الأول · 9 مواد · 72 اختبارًا و72 فرضًا', 'var(--navy)') : '') + (lv==='y5ap' ? scard('exams5ap', EX_IC, 'مواضيع الاختبارات', 'الفصل الأول · 9 مواد', 'var(--civ)') : '')
     : Object.entries(LEVELS).map(([k,o])=>scard(k, `<span class="lvn">${o.badge}</span>`, o.n, o.s, o.c)).join('');
